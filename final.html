@@ -1,0 +1,233 @@
+<script src=M_final.js></script>
+<script src=lib2k_final.js></script>
+<script src=SHAPE_final.js></script>
+
+<body bgcolor=black text=white>
+<center>
+<h1>Solar System using WebGL</h1>
+<canvas id='canvas1' width=700 height=700 style="background: url('/imgs/stars.png')"></canvas>
+</center>
+</body>
+
+<script id='fs_script1' type='x-shader/x-vertex'>
+varying vec3 vPos, vNor;
+varying vec2 vUV;
+uniform sampler2D uSampler;
+void main() {
+   vec3 normal = normalize(vNor);
+   vec3 c = vec3(.1,.1,.1);
+   c += vec3(.7,.7,1.) * max(0.,dot(normal, vec3( .7, .7, .7)));
+   c += vec3(.5,.3,.1) * max(0.,dot(normal, vec3(-.7,-.7,-.7)));
+   vec4 texture = texture2D(uSampler, vUV);
+   c *= texture.rgb;
+   gl_FragColor = vec4(sqrt(c), 1.);
+}
+</script>
+
+
+<script>
+
+var vs = '\
+attribute vec3 aPos, aNor;\n\
+attribute vec2 aUV;\n\
+varying   vec3 vPos, vNor;\n\
+varying   vec2 vUV;\n\
+uniform   mat4 matrix, invMatrix;\n\
+void main() {\n\
+   vec4 pos = matrix * vec4(aPos, 1.);\n\
+   vec4 nor = vec4(aNor, 0.) * invMatrix;\n\
+   gl_Position = pos;\n\
+   vPos = pos.xyz;\n\
+   vNor = nor.xyz;\n\
+   vUV  = aUV;\n\
+}\n\
+';
+
+
+
+   var sun, merc, venus, earth, mars, jup, sat, uran, nept, pluto;
+
+   var scene = new Scene();
+
+   var fs1 = fs_script1.innerHTML;
+
+   var material_sun = new Material(vs, fs1);
+   material_sun.setTexture('imgs/sun.jpg');
+
+   var material_merc = new Material(vs, fs1);
+   material_merc.setTexture('imgs/merc.jpg');
+
+   var material_venus = new Material(vs, fs1);
+   material_venus.setTexture('imgs/venus.jpg');
+
+   var material_earth = new Material(vs, fs1);
+   material_earth.setTexture('imgs/earth.jpg');
+
+    var material_mars = new Material(vs, fs1);
+   material_mars.setTexture('imgs/mars.jpg');
+
+   var material_jup = new Material(vs, fs1);
+   material_jup.setTexture('imgs/jupiter.jpg');
+
+   var material_sat = new Material(vs, fs1);
+   material_sat.setTexture('imgs/saturn.jpg');
+
+   var material_uran = new Material(vs, fs1);
+   material_uran.setTexture('imgs/uranus.jpg');
+
+    var material_nept = new Material(vs, fs1);
+   material_nept.setTexture('imgs/neptune.jpg');
+
+    var material_pluto = new Material(vs, fs1);
+   material_pluto.setTexture('imgs/pluto.jpg');
+
+   sun = new SceneObject();
+   sun.setVertices(SHAPE.sphere(30));
+   sun.setMaterial(material_sun);
+   scene.addObject(sun);
+
+   merc = new SceneObject();
+   merc.setVertices(SHAPE.sphere(30));
+   merc.setMaterial(material_merc);
+   scene.addObject(merc);
+
+   venus = new SceneObject();
+   venus.setVertices(SHAPE.sphere(30));
+   venus.setMaterial(material_venus);
+   scene.addObject(venus);
+
+   earth = new SceneObject();
+   earth.setVertices(SHAPE.sphere(30));
+   earth.setMaterial(material_earth);
+   scene.addObject(earth);
+
+   mars = new SceneObject();
+   mars.setVertices(SHAPE.sphere(30));
+   mars.setMaterial(material_mars);
+   scene.addObject(mars);
+
+   jup = new SceneObject();
+   jup.setVertices(SHAPE.sphere(30));
+   jup.setMaterial(material_jup);
+   scene.addObject(jup);
+
+   sat = new SceneObject();
+   sat.setVertices(SHAPE.spheretorus(30));
+   sat.setMaterial(material_sat);
+   scene.addObject(sat);
+
+   uran = new SceneObject();
+   uran.setVertices(SHAPE.spheretorus(30));
+   uran.setMaterial(material_uran);
+   scene.addObject(uran);
+
+   nept = new SceneObject();
+   nept.setVertices(SHAPE.sphere(30));
+   nept.setMaterial(material_nept);
+   scene.addObject(nept);
+
+   pluto = new SceneObject();
+   pluto.setVertices(SHAPE.sphere(30));
+   pluto.setMaterial(material_pluto);
+   scene.addObject(pluto);
+
+
+
+   canvas1.scene = scene;
+
+  //  canvas1.addEventListener('mousedown', function(e) {
+   //
+  //  })
+
+   var m = M.identityMatrix();
+
+gl_start(canvas1,
+   function(time) {
+      M.identity(m);
+
+      M.scale(m,.09);
+
+      M.save(m);
+         M.scale(m, .8);
+         M.rotateY(m, 1.5);
+         M.rotateX(m, .8);
+         sun.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[1.1*Math.cos(time/1.5),1.1*Math.sin(time/1.5),0]);
+         M.scale(m, .1);
+        //  M.rotateZ(m,time);
+         M.rotateX(m,time/3);
+         merc.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[1.6*Math.cos(time/2.5),1.6*Math.sin(time/2.5),0]);
+         M.scale(m, .2);
+        //  M.rotateZ(m,time);
+         M.rotateX(m,time/3);
+         venus.setMatrix(m);
+      M.restore(m);
+
+
+      M.save(m);
+         M.translate(m,[2.3*Math.cos(time/3.2),2.3*Math.sin(time/3.2),0]);
+         M.scale(m, .3);
+         M.rotateY(m,time);
+         M.rotateX(m,-2);
+         earth.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[3*Math.cos(time/4),3*Math.sin(time/4),0]);
+         M.scale(m, .2);
+        //  M.rotateZ(m,time);
+         M.rotateX(m,time/3);
+         mars.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[4.5*Math.cos(time/5.3),4.5*Math.sin(time/5.3),0]);
+         M.scale(m, .5);
+         M.rotateX(m,time/3);
+         jup.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[6*Math.cos(time/6.1),6*Math.sin(time/6.1),0]);
+         M.scale(m, .55);
+         M.rotateY(m, time);
+         M.rotateX(m, 5);
+         sat.setMatrix(m);
+      M.restore(m);
+
+       M.save(m);
+         M.translate(m,[8*Math.cos(time/6.9),8*Math.sin(time/6.9),0]);
+         M.scale(m, .3);
+
+         M.rotateX(m, 5);
+         M.rotateY(m,time/5);
+         uran.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[9.5*Math.cos(time/8),9.5*Math.sin(time/8),0]);
+         M.scale(m, .2);
+        //  M.rotateZ(m,time);
+         M.rotateX(m,time/3);
+         nept.setMatrix(m);
+      M.restore(m);
+
+      M.save(m);
+         M.translate(m,[11*Math.cos(time/9), 11*Math.sin(time/9),0]);
+         M.scale(m, .05);
+        //  M.rotateZ(m,time);
+         M.rotateX(m,time/3);
+         pluto.setMatrix(m);
+      M.restore(m);
+
+   }
+);
+
+</script>
